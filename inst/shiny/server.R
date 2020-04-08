@@ -2,6 +2,12 @@ options(shiny.maxRequestSize = 30 * 1024 ^ 2)
 
 shinyServer(function(input, output) {
 
+  # This is the code for the legacy export link text/url:
+  url <- a("Legacy Exporter", href='https://github.com/emmamorgan-tufts/QualtricsTools/wiki/Appendix-of-Qualtrics-Terms#legacy-and-insights-data')
+  output$Legacy_Exporter <- renderUI({
+    tagList("QualtricsTools requires data be exported with the ", url, ".")
+  })
+
   # reactiveValues are values which, similar to the input values,
   # cause any reactive block which depends on them to recalculate its output.
   # Here we are constructing the values[['unselected_questions']] list initially
@@ -392,7 +398,7 @@ shinyServer(function(input, output) {
     renderUI(div(HTML(results_tables()), class = "shiny-html-output"))
 
   output[['question_dictionary']] <-
-    renderDataTable(question_dictionary(),
+    DT::renderDataTable(question_dictionary(),
                     options = list(
                       scrollX = TRUE,
                       pageLength = 10,
@@ -405,7 +411,7 @@ shinyServer(function(input, output) {
   output[['display_logic']] <-
     renderUI(div(HTML(display_logic()), class = "shiny-html-output"))
 
-  output[['select_qdict']] = renderDataTable({
+  output[['select_qdict']] = DT::renderDataTable({
     include_exclude_dict()
   }, options =
     list(

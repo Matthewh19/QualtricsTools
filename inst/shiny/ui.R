@@ -14,7 +14,7 @@ sidebar <- dashboardSidebar(
                        accept=c('text/csv', 'text/comma-separated-values', '.csv')
              ),
              div(class="sidebar-text",
-                 HTML("QualtricsTools requires data be exported with the <a href='https://github.com/emmamorgan-tufts/QualtricsTools/wiki/Appendix-of-Qualtrics-Terms#legacy-and-insights-data', target='_blank'>Legacy Exporter</a>.")),
+                 uiOutput("Legacy_Exporter")),
              checkboxInput("insights_or_not", "Unchecked Legacy View Results (3 header rows & QIDs)?", value = TRUE, width = NULL)
              ),
     menuItem("Processed Results", tabName="report", icon=icon("leanpub")),
@@ -46,7 +46,7 @@ body <- dashboardBody(
                       ),
               tabPanel(h5("question dictionary"),
                        checkboxInput("uncodeable-only", "Only Uncodeable Questions", value = FALSE, width = NULL),
-                       dataTableOutput("question_dictionary")
+                       DT::dataTableOutput("question_dictionary")
                        ),
               tabPanel(h5("text appendices"),
                        uiOutput("text_appendices")
@@ -65,7 +65,7 @@ body <- dashboardBody(
             actionButton("selectAll", "Unselect/Select All"),
             actionButton("submit", "Apply"),
             HTML("<br><br>"),
-              dataTableOutput("select_qdict")
+              DT::dataTableOutput("select_qdict")
               )
   )),
   tabItem(tabName = "more_options",
