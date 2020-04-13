@@ -206,6 +206,7 @@ choice_text_from_question <- function(question, choice) {
 #' This function launches the Shiny interface for the QualtricsTools
 #' package from the files in the install or 'inst' directory.
 app <- function() {
+  enableBookmarking(store = "server")
   shiny::runApp(system.file('shiny', package = 'QualtricsTools'),
                 launch.browser = TRUE)
 }

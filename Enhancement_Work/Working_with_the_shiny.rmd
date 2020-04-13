@@ -18,3 +18,14 @@ app()
 ```
 
 
+
+
+## Runing Qualtrics from github
+
+```{r}
+devtools::install_github("Matthewh19/QualtricsTools", ref = "Shiny_Development")
+
+
+```
+
+

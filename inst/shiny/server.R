@@ -237,6 +237,22 @@ shinyServer(function(input, output) {
     }
   })
 
+
+  # ## Save and restore the results_table
+  # onBookmark(function(state){
+  #   state$values$results_tables <- results_tables
+  #
+  # })
+  #
+  # onRestore(function(state){
+  #
+  #   results_tables <- state$values$results_tables
+  #
+  # })
+
+
+
+
   # The question_dictionary block uses the survey from the survey_and_responses output
   # to create a data frame detailing each survey question. This depends on two following
   # reactive code-blocks, which are the complete_question_dictionary and uncodeable_question_dictionary.
