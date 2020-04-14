@@ -12,8 +12,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Setup:
 ```{r}
-devtools::load_all(".")
-app()
+#devtools::load_all(".")
+#app()
 
 ```
 
@@ -25,7 +25,10 @@ app()
 ```{r}
 devtools::install_github("Matthewh19/QualtricsTools", ref = "Shiny_Development")
 
+library(QualtricsTools)
 
+
+app()
 ```
 
 
