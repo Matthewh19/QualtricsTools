@@ -5,7 +5,8 @@ ui <- function(request) {
     verbatimTextOutput("out"),
 
     actionButton("Load", "Load"),
-    selectInput("Select_settings", "Select which settings to use.", c("default")),
+    selectInput("Select_settings", "Select which settings to use.", c("default_bookmark")),
+    actionButton("Go", "Go"),
     textInput("book_name", "Enter the name of your bookmark"),
     bookmarkButton()
   )
@@ -27,6 +28,15 @@ server <- function(input, output, session) {
 
     updateSelectInput(session, "Select_settings",
                       choices = list)
+  })
+
+  observeEvent(input$Go, {
+    choice <- paste(input$Select_settings, "rds", sep = ".")
+
+    choice_list <- readRDS(file = here::here("Enhancement_Work", "Sample Shiny", "shiny_bookmark_names", choice))
+    url <- choice_list[['url']]
+    updateQueryString(url, mode = "push")
+
   })
 
   onBookmarked(function(url) {
