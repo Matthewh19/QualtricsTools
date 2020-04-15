@@ -29,7 +29,6 @@ ui <- function(request){
                 h5(""),
                 downloadButton('downloadZip', 'Download Zip', class="btn-primary"),
                 h5(""),
-                bookmarkButton(),
                 actionButton("quit", "Stop App")
     )
   )
@@ -123,7 +122,15 @@ ui <- function(request){
                   h3('Ignore Survey Flow'),
                   checkboxInput("ignoreflow", "Check this box if you would like the report to render without reordering
                               the questions according to the survey's ordering.", FALSE)
-                )
+                ),
+                sidebarPanel(
+                  h3('Bookmarking The App'),
+                  actionButton("Load", "Load"),
+                  selectInput("Select_settings", "Select which settings to use.", c("default_bookmark")),
+                  actionButton("Go", "Go"),
+                  textInput("book_name", "Enter the name of your bookmark"),
+                  bookmarkButton(),
+                ),
               )
       ))
   )

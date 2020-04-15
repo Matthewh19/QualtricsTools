@@ -35,8 +35,9 @@ server <- function(input, output, session) {
 
     choice_list <- readRDS(file = here::here("Enhancement_Work", "Sample Shiny", "shiny_bookmark_names", choice))
     url <- choice_list[['url']]
-    updateQueryString(url, mode = "push")
 
+    updateQueryString(url, mode = "replace")
+    session$reload()
   })
 
   onBookmarked(function(url) {
@@ -45,6 +46,7 @@ server <- function(input, output, session) {
 
     saveRDS(x, file = here::here("Enhancement_Work", "Sample Shiny", "shiny_bookmark_names", name))
     # saveRDS(x, file = here::here("inst", "shiny", "shiny_bookmark_names", name))
+
 
     showNotification("The current state of QualtricsTools has been saved!", type = "message", duration = 7)
 
@@ -78,5 +80,14 @@ shinyApp(ui, server, enableBookmarking = "server")
 # length(list)
 # list[2]
 
-
-
+# choice_list <- readRDS(file = here::here("Enhancement_Work", "Sample Shiny", "shiny_bookmark_names", choice))
+# url <- choice_list[['url']]
+#
+# url
+#
+# locate <- stringr::str_locate(url, "state_id_=")
+#
+#
+# querry <- stringr::str_sub(url, start = (locate[, 2] + 1), end = -1L)
+#
+# url

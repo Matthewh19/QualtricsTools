@@ -1,6 +1,6 @@
 options(shiny.maxRequestSize = 30 * 1024 ^ 2)
 
-shinyServer(function(input, output) {
+shinyServer(function(input, output, session) {
 
   # This is the code for the legacy export link text/url:
   url <- a("Legacy Exporter", href='https://github.com/emmamorgan-tufts/QualtricsTools/wiki/Appendix-of-Qualtrics-Terms#legacy-and-insights-data')
@@ -655,6 +655,57 @@ shinyServer(function(input, output) {
     },
     contentType = "application/zip"
   )
+
+  ######################################
+  ## Neccessary Bookmarking code
+  ###############################
+  observeEvent(input$Load, {
+    list <- list.files(here::here("inst", "shiny", "shiny_bookmarks", "shiny_bookmark_names"))
+    list <- stringr::str_replace(list, pattern = ".rds", replacement = "")
+    list <- unlist(list)
+
+
+    updateSelectInput(session, "Select_settings",
+                      choices = list)
+  })
+
+  observeEvent(input$Go, {
+    choice <- paste(input$Select_settings, "rds", sep = ".")
+
+    choice_list <- readRDS(file = here::here("inst", "shiny", "shiny_bookmarks", "shiny_bookmark_names", choice))
+    url <- choice_list[['url']]
+
+    updateQueryString(url, mode = "replace")
+    session$reload()
+  })
+
+  onBookmarked(function(url) {
+    name <- paste(input$book_name, Sys.Date(), "bookmark.rds", sep = "_")
+    x <- list("name" = input$book_name, "url" = url)
+
+    saveRDS(x, file = here::here("inst", "shiny", "shiny_bookmarks", "shiny_bookmark_names", name))
+
+    showNotification("The current state of QualtricsTools has been saved!", type = "message", duration = 7)
+  })
+
+
+  ###############################
+# Changin where bookmarks are saved
+
+  # my_save_interface <- function(id, callback) {
+  #   path <- switch(
+  #     Sys.info()[['sysname']],
+  #     Windows = gsub("\\\\", "/", file.path(Sys.getenv("USERPROFILE"),"Desktop",fsep="/")),
+  #     Darwin = "~/Desktop",
+  #     getShinyOption("appDir", default = getwd())
+  #   )
+  #   stateDir <- file.path(path, "shiny_bookmarks", id)
+  #   if (!shiny:::dirExists(stateDir))
+  #     dir.create(stateDir, recursive = TRUE)
+  #   callback(stateDir)
+  # }
+  #
+  # shinyOptions(save.interface = my_save_interface)
 
 
   ########## Stop Button
