@@ -690,22 +690,7 @@ shinyServer(function(input, output, session) {
 
 
   ###############################
-# Changin where bookmarks are saved
 
-  # my_save_interface <- function(id, callback) {
-  #   path <- switch(
-  #     Sys.info()[['sysname']],
-  #     Windows = gsub("\\\\", "/", file.path(Sys.getenv("USERPROFILE"),"Desktop",fsep="/")),
-  #     Darwin = "~/Desktop",
-  #     getShinyOption("appDir", default = getwd())
-  #   )
-  #   stateDir <- file.path(path, "shiny_bookmarks", id)
-  #   if (!shiny:::dirExists(stateDir))
-  #     dir.create(stateDir, recursive = TRUE)
-  #   callback(stateDir)
-  # }
-  #
-  # shinyOptions(save.interface = my_save_interface)
 
 
   ########## Stop Button

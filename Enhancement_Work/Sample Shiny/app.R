@@ -8,7 +8,10 @@ ui <- function(request) {
     selectInput("Select_settings", "Select which settings to use.", c("default_bookmark")),
     actionButton("Go", "Go"),
     textInput("book_name", "Enter the name of your bookmark"),
+    shinyDirButton('folder', 'Folder select', 'Please select a folder', FALSE),
+    verbatimTextOutput("text"),
     bookmarkButton()
+
   )
 }
 server <- function(input, output, session) {
@@ -20,7 +23,8 @@ server <- function(input, output, session) {
   })
 
   observeEvent(input$Load, {
-    list <- list.files(here::here("Enhancement_Work", "Sample Shiny", "shiny_bookmark_names"))
+    path <- parseDirPath(roots = roots, input$folder)
+    list <- list.files(paste(path, "shiny_bookmarks", "shiny_bookmark_names", sep = "//"))
     #list <- list.files(here::here("inst", "shiny", "shiny_bookmark_names"))
     list <- stringr::str_replace(list, pattern = ".rds", replacement = "")
     list <- unlist(list)
@@ -30,10 +34,48 @@ server <- function(input, output, session) {
                       choices = list)
   })
 
+  roots = c(wd='C:\\')
+  shinyDirChoose(input, 'folder',  roots = roots, filetypes=c('', 'txt'))
+
+
+  output$text <- renderPrint({
+    parseDirPath(roots = roots, input$folder)
+  })
+
+  # reactive({
+  #   filepath <- input$folder
+  #   saveRDS(filepath, file = "C:/Users/Matth/Desktop/shiny_bookmarks/filepath.rds")
+  #   strfilepath <- str(input$folder)
+  #   saveRDS(strfilepath, file = "C:/Users/Matth/Desktop/shiny_bookmarks/strfilepath.rds")
+  #
+  # })
+  # Changin where bookmarks are saved Sys.getenv("USERPROFILE"),"Desktop",fsep="/"
+
+  my_save_interface <- function(id, callback) {
+    # path <- switch(
+    #   Sys.info()[['sysname']],
+    #   Windows = gsub("\\\\", "/", file.path(str(input$folder))),
+    #   Darwin = "~/Desktop",
+    #   getShinyOption("appDir", default = getwd())
+    # )
+    path <- parseDirPath(roots = roots, input$folder)
+    stateDir <- file.path(path, "shiny_bookmarks", id)
+    if (!shiny:::dirExists(stateDir))
+      dir.create(stateDir, recursive = TRUE)
+    callback(stateDir)
+  }
+
+  shinyOptions(save.interface = my_save_interface)
+
+
   observeEvent(input$Go, {
     choice <- paste(input$Select_settings, "rds", sep = ".")
 
-    choice_list <- readRDS(file = here::here("Enhancement_Work", "Sample Shiny", "shiny_bookmark_names", choice))
+    path <- parseDirPath(roots = roots, input$folder)
+    path <- "C:/Users/Matth/Desktop/testing shiny"
+    choice <- "Hi_2020-04-21_bookmark.rds"
+    choice_list <- readRDS(file = paste(path, "shiny_bookmarks", "shiny_bookmark_names" ,choice, sep = "/"))
+    rds <- readRDS(file = "C:/Users/Matth/Desktop/testing shiny/shiny_bookmarks/bc367f9be0e649fb/input.rds" )
     url <- choice_list[['url']]
 
     updateQueryString(url, mode = "replace")
@@ -42,9 +84,10 @@ server <- function(input, output, session) {
 
   onBookmarked(function(url) {
     name <- paste(input$book_name, Sys.Date(), "bookmark.rds", sep = "_")
-    x <- list("name" = input$book_name, "url" = url)
+    path <- parseDirPath(roots = roots, input$folder)
+    x <- list("name" = input$book_name, "url" = url, 'path' = path)
 
-    saveRDS(x, file = here::here("Enhancement_Work", "Sample Shiny", "shiny_bookmark_names", name))
+    saveRDS(x, file = paste(path, "shiny_bookmarks", "shiny_bookmark_names", name, sep = "//"))
     # saveRDS(x, file = here::here("inst", "shiny", "shiny_bookmark_names", name))
 
 

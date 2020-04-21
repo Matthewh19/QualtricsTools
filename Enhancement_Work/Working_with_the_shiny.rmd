@@ -32,3 +32,15 @@ app()
 ```
 
 
+
+# Found this package...
+
+```{r}
+devtools::install_github("thomasp85/shinyFiles")
+library(shinyFiles)
+
+
+filepath <- readRDS("C:\Users\Matth\Desktop\shiny_bookmarks\filepath.rds")
+```
+
+
