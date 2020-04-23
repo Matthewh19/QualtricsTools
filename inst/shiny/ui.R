@@ -9,14 +9,16 @@ ui <- function(request){
                 menuItem("File Uploading",
                          icon=icon("upload"),
                          selected=TRUE,
-                         fileInput('file1',
-                                   'Choose QSF Survey File',
-                                   accept=c('text/qsf', 'text/plain', '.qsf')
-                         ),
-                         fileInput('file2',
-                                   'Choose CSV Response Set File',
-                                   accept=c('text/csv', 'text/comma-separated-values', '.csv')
-                         ),
+                         shinyFilesButton('file1', "Browse...", "Choose QSF Survey File", multiple = FALSE),
+                         shinyFilesButton('file2', "Browse...", "Choose CSV Response Set File", multiple = FALSE),
+                         # fileInput('file1',
+                         #           'Choose QSF Survey File',
+                         #           accept=c('text/qsf', 'text/plain', '.qsf')
+                         # ),
+                         # fileInput('file2',
+                         #           'Choose CSV Response Set File',
+                         #           accept=c('text/csv', 'text/comma-separated-values', '.csv')
+                         # ),
                          div(class="sidebar-text",
                              uiOutput("Legacy_Exporter")),
                          checkboxInput("insights_or_not", "Unchecked Legacy View Results (3 header rows & QIDs)?", value = TRUE, width = NULL)

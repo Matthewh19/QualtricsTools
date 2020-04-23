@@ -15,6 +15,18 @@ shinyServer(function(input, output, session) {
   # users specify questions to be included and excluded.
   values <- reactiveValues(unselected_questions = c())
 
+  shinyFileChoose(input, 'file1', roots=c(wd='C:\\'), filetypes=c('qsf'),
+                  defaultPath='', defaultRoot='wd')
+
+  shinyFileChoose(input, 'file2', roots=c(wd='C:\\'), filetypes=c('csv'),
+                  defaultPath='', defaultRoot='wd')
+
+  output$test <- renderPrint({
+    qsf_path <- parseFilePaths(roots=c(wd='C:\\'), input$file1)
+    qsf_path
+  })
+
+
   # The survey_and_responses reactive block reads the input files
   # and loads them as the survey and responses. It validates that there
   # are no duplicate data export tags in the survey, and it returns a
@@ -24,6 +36,10 @@ shinyServer(function(input, output, session) {
   # 3. the original_first_rows.
   survey_and_responses <- reactive({
 
+    qsf_path <- parseFilePaths(roots=c(wd='C:\\'), input$file1)
+    csv_path <- parseFilePaths(roots=c(wd='C:\\'), input$file2)
+
+
     if(input$load == "Load"){
       choice <- paste(input$Select_settings, "rds", sep = ".")
 
@@ -32,7 +48,7 @@ shinyServer(function(input, output, session) {
 
       survey <- load_qsf_data(choice_list$qsf_path$datapath)
     } else{
-      survey <- load_qsf_data(input[['file1']])
+      survey <- load_qsf_data(qsf_path)
     }
 
     # If there are questions which are unselected, meaning they've been set to
@@ -77,7 +93,7 @@ shinyServer(function(input, output, session) {
     if(input$load == "Load"){
       responses <- load_csv_data(choice_list$csv_path$datapath, choice_list$qsf_path$datapath, headerrows)
     } else{
-      responses <- load_csv_data(input$file2, input$file1, headerrows)
+      responses <- load_csv_data(csv_path, qsf_path, headerrows)
     }
     original_first_rows <- responses[[2]]
     responses <- responses[[1]]
