@@ -6,7 +6,8 @@ ui <- function(request) {
 
     actionButton("Load", "Load"),
     selectInput("Select_settings", "Select which settings to use.", c("default_bookmark")),
-    actionButton("Go", "Go"),
+    # actionButton("Go", "Go"),
+    radioButtons("load", " ", c("Do Not Load", "Load")),
     textInput("file_name", "Enter the name of your file"),
     shinyDirButton('folder', 'Folder select', 'Please select a folder', FALSE),
     verbatimTextOutput("text"),
@@ -39,6 +40,7 @@ server <- function(input, output, session) {
 
   output$text <- renderPrint({
     parseDirPath(roots = roots, input$folder)
+    #input$load
   })
 
   my_save_interface <- function(id, callback) {
@@ -100,7 +102,7 @@ shinyApp(ui, server, enableBookmarking = "server")
 
 #
 #
-# hey <- readRDS(file = paste("C:/Users/Matth/Desktop/testing shiny", "shiny_bookmarks", "shiny_test_2020-04-22_bookmark.rds", sep = "/"))
+# hey <- readRDS(file = paste("C:/Users/Matth/Desktop/testing shiny", "shiny_bookmarks", "Dummy_Enhancement_Survey_2020-04-23_bookmark.rds", sep = "/"))
 # hey
 #
 # text <- hey[['text']]

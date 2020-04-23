@@ -128,8 +128,11 @@ ui <- function(request){
                   actionButton("Load", "Load"),
                   selectInput("Select_settings", "Select which settings to use.", c("default_bookmark")),
                   actionButton("Go", "Go"),
-                  textInput("book_name", "Enter the name of your bookmark"),
-                  bookmarkButton(),
+                  radioButtons("load", " ", c("Do Not Load", "Load")),
+                  textInput("file_name", "Enter the name of your file"),
+                  shinyDirButton('folder', 'Folder select', 'Please select a folder', FALSE),
+                  verbatimTextOutput("text"),
+                  actionButton("Save", "Save")
                 ),
               )
       ))

@@ -44,3 +44,14 @@ filepath <- readRDS("C:\Users\Matth\Desktop\shiny_bookmarks\filepath.rds")
 ```
 
 
+
+
+```{r}
+
+hey <- readRDS(file = paste("C:/Users/Matth/Desktop/testing shiny", "shiny_bookmarks", "Dummy_Enhancement_Survey_2020-04-23_bookmark.rds", sep = "/"))
+
+survey = rjson::fromJSON(file= hey$qsf_path$datapath)
+
+```
+
+

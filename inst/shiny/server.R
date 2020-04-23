@@ -24,7 +24,16 @@ shinyServer(function(input, output, session) {
   # 3. the original_first_rows.
   survey_and_responses <- reactive({
 
-    survey <- load_qsf_data(input[['file1']])
+    if(input$load == "Load"){
+      choice <- paste(input$Select_settings, "rds", sep = ".")
+
+      path <- parseDirPath(roots = roots, input$folder)
+      choice_list <- readRDS(file = paste(path, "shiny_bookmarks", choice, sep = "/"))
+
+      survey <- load_qsf_data(choice_list$qsf_path$datapath)
+    } else{
+      survey <- load_qsf_data(input[['file1']])
+    }
 
     # If there are questions which are unselected, meaning they've been set to
     # be excluded, go through the survey and mark these questions with the
@@ -65,7 +74,11 @@ shinyServer(function(input, output, session) {
 
     # load_csv_data returns a pair of two elements, the responses and
     # the original_first_rows.
-    responses <- load_csv_data(input$file2, input$file1, headerrows)
+    if(input$load == "Load"){
+      responses <- load_csv_data(choice_list$csv_path$datapath, choice_list$qsf_path$datapath, headerrows)
+    } else{
+      responses <- load_csv_data(input$file2, input$file1, headerrows)
+    }
     original_first_rows <- responses[[2]]
     responses <- responses[[1]]
 
@@ -75,6 +88,9 @@ shinyServer(function(input, output, session) {
     list_survey_and_responses[[2]] <- responses
     list_survey_and_responses[[3]] <- original_first_rows
     return(list_survey_and_responses)
+
+    updateRadioButtons(session, "load", selected = "Do Not Load")
+
   })
 
   # This is a reactive block wrapped around the get_reorganized_questions_and_blocks
@@ -659,8 +675,29 @@ shinyServer(function(input, output, session) {
   ######################################
   ## Neccessary Bookmarking code
   ###############################
+
+  ## Code to load in the file path
+  roots = c(wd='C:\\')
+  shinyDirChoose(input, 'folder',  roots = roots, filetypes=c('', 'txt'))
+
+  output$text <- renderPrint({
+    parseDirPath(roots = roots, input$folder)
+  })
+
+  # Now we change where files are automatically saved
+  my_save_interface <- function(id, callback) {
+    path <- parseDirPath(roots = roots, input$folder)
+    stateDir <- file.path(path, "shiny_bookmarks", id)
+    if (!shiny:::dirExists(stateDir))
+      dir.create(stateDir, recursive = TRUE)
+    callback(stateDir)
+  }
+
+
+  ## Here we load a list of options of the saved states for the user to choose from
   observeEvent(input$Load, {
-    list <- list.files(here::here("inst", "shiny", "shiny_bookmarks", "shiny_bookmark_names"))
+    path <- parseDirPath(roots = roots, input$folder)
+    list <- list.files(paste(path, "shiny_bookmarks", sep = "//"))
     list <- stringr::str_replace(list, pattern = ".rds", replacement = "")
     list <- unlist(list)
 
@@ -669,21 +706,20 @@ shinyServer(function(input, output, session) {
                       choices = list)
   })
 
-  observeEvent(input$Go, {
-    choice <- paste(input$Select_settings, "rds", sep = ".")
+  shinyOptions(save.interface = my_save_interface)
 
-    choice_list <- readRDS(file = here::here("inst", "shiny", "shiny_bookmarks", "shiny_bookmark_names", choice))
-    url <- choice_list[['url']]
+  # Here we save the state of the app if the save button is pressed
+  observeEvent(input$Save, {
+    name <- paste(input$file_name, Sys.Date(), "bookmark.rds", sep = "_")
+    path <- parseDirPath(roots = roots, input$folder)
 
-    updateQueryString(url, mode = "replace")
-    session$reload()
-  })
+    qsf_path <- input$file1
 
-  onBookmarked(function(url) {
-    name <- paste(input$book_name, Sys.Date(), "bookmark.rds", sep = "_")
-    x <- list("name" = input$book_name, "url" = url)
+    csv_path <- input$file2
 
-    saveRDS(x, file = here::here("inst", "shiny", "shiny_bookmarks", "shiny_bookmark_names", name))
+    x <- list("name" = input$file_name, "path" = path, "qsf_path" = qsf_path, "csv_path" = csv_path)
+
+    saveRDS(x, file = paste(path, "shiny_bookmarks", name, sep = "//"))
 
     showNotification("The current state of QualtricsTools has been saved!", type = "message", duration = 7)
   })
