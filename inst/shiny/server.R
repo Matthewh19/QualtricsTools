@@ -1120,6 +1120,10 @@ shinyServer(function(input, output, session) {
       flow <- flow_from_survey(survey)
       original_first_rows <- survey_and_responses()[[3]]
       original_first_row <- original_first_rows[1, ]
+      print(split_blocks)
+      print(survey)
+      print(flow)
+      print(original_first_row)
       for (i in 1:length(split_blocks)) {
         fs <-
           c(fs,
@@ -1179,6 +1183,7 @@ shinyServer(function(input, output, session) {
         }
 
       }
+      print(fs)
       zip(zipfile = fname,
           files = fs,
           flags = "-j")
