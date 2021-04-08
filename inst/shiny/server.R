@@ -1179,7 +1179,8 @@ shinyServer(function(input, output, session) {
         }
 
       }
-      print("Files:", fs)
+      print("Files:")
+      print(fs)
       print("saving the zip")
       zip(zipfile = fname,
           files = fs,
