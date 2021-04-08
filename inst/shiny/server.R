@@ -1184,8 +1184,8 @@ shinyServer(function(input, output, session) {
       zip(zipfile = fname,
           files = fs,
           flags = "-j")
+      print("Done saving the zip")
     },
-    print("Done saving the zip")
     contentType = "application/zip"
   )
 
