@@ -1049,6 +1049,7 @@ shinyServer(function(input, output, session) {
       zip(zipfile = fname,
           files = fs,
           flags = "-j")
+      browser()
       # if (file.exists(paste0(fname, ".zip")))
       #   print("Yes")
       # else
