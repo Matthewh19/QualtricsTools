@@ -1049,8 +1049,12 @@ shinyServer(function(input, output, session) {
       zip(zipfile = fname,
           files = fs,
           flags = "-j")
-    },
-    contentType = "application/zip"
+      # if (file.exists(paste0(fname, ".zip")))
+      #   print("Yes")
+      # else
+      #   print("no")
+    }
+    # contentType = "application/zip"
   )
 
   # Download Tableau Zip----
