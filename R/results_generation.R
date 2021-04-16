@@ -1332,3 +1332,36 @@ generate_results <- function(questions, original_first_rows) {
   return(questions)
 }
 
+
+
+
+#' Create a graph of the data
+#'
+#' The generate_graph function takes a data table and graphs it
+#'
+#' @param question A question from a Qualtrics Survey File that we want a graph for
+#' @param graph_type The type of graph to make
+#' @param column1 The first column to be used
+#' @param column2 The second column to be used
+#' @param g_title The title of the graph
+#'
+#' @return A ggplot graph
+generate_graph <- function(question, graph_type, column1, column2, g_title) {
+  print(graph_type)
+  print(column1)
+  print(column2)
+  print(g_title)
+  data <- question[['Responses']]
+  # View(data)
+  # p <- ggplot(data, aes(x = UQ(as.name(column1)), y = UQ(as.name(column2)))) +
+  p <- ggplot(data, aes(x = column1, y = column2)) +
+    xlab(column1) +
+    ylab(column2) +
+    ggtitle(g_title)
+  if(graph_type == "point"){
+    p <- p + geom_point()
+  } else if(graph_type == "line"){
+    p <- p + geom_line()
+  }
+  return(p)
+}

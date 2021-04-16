@@ -1211,4 +1211,109 @@ shinyServer(function(input, output, session) {
     else
       stopApp("Have a great day!")
   })
+
+
+  ################################
+  ## The graph stuff
+  #######################
+  output$the_graph <- renderPlot({
+    graph_type <- input$graphtype_select
+    column1 <- input$col1_select
+    column2 <- input$col2_select
+    if(!is.null(column1) && !is.null(column2)){
+      g_title <- input$graph_title
+
+      # generate_graph(q, graph_type, column1, column2, g_title )
+      data <- survey_and_responses()[[2]]
+      # View(data)
+      p <- ggplot(data, aes(x = UQ(as.name(column1)), y = UQ(as.name(column2)))) +
+        xlab(column1) +
+        ylab(column2) +
+        ggtitle(g_title)
+      if(graph_type == "point"){
+        p <- p + geom_point()
+      } else if(graph_type == "line"){
+        p <- p + geom_line()
+      }
+      p
+    }
+  })
+  #
+  #
+  # Select the question
+  # output[['select_question']] <- renderUI({
+  #   if (length(survey_and_responses()) >= 3) {
+  #     qs <- c()
+  #     for(i in 1:length(questions)){
+  #       qs <- c(qs, questions[[i]][['Payload']][['DataExportTag']])
+  #     }
+  #     selectInput(
+  #       'question_select',
+  #       'Question',
+  #       qs,
+  #       multiple = FALSE,
+  #       selectize = TRUE
+  #     )
+  #   }
+  # })
+
+  the_question <- reactive({
+  q <- find_question(questions, input$question_select)
+  # print(q)
+  q
+  })
+
+  # Select the type
+  output[['select_graphtype']] <- renderUI({
+    ty <- c("point", "line")
+    selectInput(
+      'graphtype_select',
+      'Graph Type',
+      ty,
+      multiple = FALSE,
+      selectize = TRUE
+    )
+  })
+
+  output[['select_column1']] <- renderUI({
+    # col1 <- names(the_question()[['Responses']])
+    # selectInput(
+    #   'col1_select',
+    #   'Column 1 select',
+    #   col1,
+    #   multiple = FALSE,
+    #   selectize = TRUE
+    # )
+    #
+    if (length(survey_and_responses()) >= 3) {
+      selectInput(
+        'col1_select',
+        'Column for x axis',
+        colnames(survey_and_responses()[[2]]),
+        multiple = FALSE,
+        selectize = TRUE
+      )
+    }
+  })
+
+  output[['select_column2']] <- renderUI({
+    # col2 <- names(the_question()[['Responses']])
+    # selectInput(
+    #   'col2_select',
+    #   'Column 2 select',
+    #   col2,
+    #   multiple = FALSE,
+    #   selectize = TRUE
+    # )
+    if (length(survey_and_responses()) >= 3) {
+      selectInput(
+        'col2_select',
+        'Column for y axis',
+        colnames(survey_and_responses()[[2]]),
+        multiple = FALSE,
+        selectize = TRUE
+      )
+    }
+  })
 })
+

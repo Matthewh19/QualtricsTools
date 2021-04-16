@@ -1,0 +1,47 @@
+---
+title: "Testing"
+author: "Matthew Hudes"
+date: "4/14/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+devtools::load_all(".")
+# app()
+# devtools::install_github("emma-morgan/QualtricsTools")
+# library(tidyverse)
+# library(QualtricsTools)
+# qsf_path = here::here("Testing stuff", "Example data", "QualtricsTools_Sample_Survey_Winter2021.qsf")
+# csv_path = here::here("Testing stuff", "Example data", "QualtricsTools+Sample+Survey+Winter2021_January+23,+2021_14.59_DataTable.csv")
+qsf_path = here::here("Working_Code", "Example data", "Long_Exhaustive_Sample_Survey.qsf")
+csv_path = here::here("Working_Code", "Example data", "Long_Exhaustive_Sample_Survey_January+29,+2021_10.20_DataTable.csv")
+# qsf_path = here::here("Testing stuff", "Example data", "Grad_Admin.qsf")
+# csv_path = here::here("Testing stuff", "Example data", "Grad_Admin.csv")
+headerrows = 3
+get_setup(
+  qsf_path = qsf_path,
+  csv_path = csv_path,
+  headerrows = headerrows
+)
+```
+
+```{r}
+
+q <- questions[[5]]
+
+graph_type <- "point"
+column1 <- "red_pandas_3"
+column2 <- "exotic_frogs_3"
+g_title <- "test plot"
+library(ggplot2)
+
+plot <- generate_graph(q, graph_type, column1, column2, g_title )
+plot
+```
+
+
+
