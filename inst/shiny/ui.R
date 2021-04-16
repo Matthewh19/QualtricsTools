@@ -119,6 +119,8 @@ body <- dashboardBody(
                    box(
                      width = NULL,
                      status = "info",
+                     collapsible = TRUE,
+                     solidHeader = TRUE,
                      # h2("Graph Options"),
                      # uiOutput("select_question"),
                      uiOutput("select_column1"),
@@ -130,6 +132,8 @@ body <- dashboardBody(
                    ),
                    box(
                      width = NULL,
+                     collapsible = TRUE,
+                     solidHeader = TRUE,
                      status = "warning",
                      textInput("filename", "File name:"),
                      downloadButton("downloadPlot")
