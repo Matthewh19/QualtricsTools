@@ -1211,27 +1211,49 @@ shinyServer(function(input, output, session) {
   ## The graph stuff
   #######################
   output$the_graph <- renderPlot({
+    p <- The_plot()
+    p
+  })
+  
+  The_plot <- reactive({
     graph_type <- input$graphtype_select
     column1 <- input$col1_select
     column2 <- input$col2_select
     if(!is.null(column1) && !is.null(column2)){
       g_title <- input$graph_title
-
+      
       # generate_graph(q, graph_type, column1, column2, g_title )
       data <- survey_and_responses()[[2]]
+      en <- data.frame("Response_Number" = 1:nrow(data))
+      data <- cbind(en, data)
       # View(data)
       p <- ggplot(data, aes(x = UQ(as.name(column1)), y = UQ(as.name(column2)))) +
-        xlab(column1) +
-        ylab(column2) +
-        ggtitle(g_title)
-      if(graph_type == "point"){
-        p <- p + geom_point()
-      } else if(graph_type == "line"){
-        p <- p + geom_line()
+            ggtitle(g_title)
+      if(input$x_label == ""){
+        p <- p + xlab(column1)
+      } else{
+        p <- p + xlab(input$x_label)
+      }
+      if(input$y_label == ""){
+        p <- p + ylab(column2)
+      } else{
+        p <- p + ylab(input$y_label)
+      }
+      if(!is.null(graph_type)){
+        graph_type <- paste(graph_type, collapse = "|")
+        # print(graph_type)
+        # print(typeof(graph_type))
+        if(grepl("point", graph_type)){
+          p <- p + geom_point()
+        }
+        if(grepl("line", graph_type)){
+          p <- p + geom_line()
+        }
       }
       p
     }
   })
+  
   #
   #
   # Select the question
@@ -1264,26 +1286,18 @@ shinyServer(function(input, output, session) {
       'graphtype_select',
       'Graph Type',
       ty,
-      multiple = FALSE,
-      selectize = TRUE
+      multiple = TRUE,
+      selectize = TRUE,
+      selected = "point"
     )
   })
 
   output[['select_column1']] <- renderUI({
-    # col1 <- names(the_question()[['Responses']])
-    # selectInput(
-    #   'col1_select',
-    #   'Column 1 select',
-    #   col1,
-    #   multiple = FALSE,
-    #   selectize = TRUE
-    # )
-    #
     if (length(survey_and_responses()) >= 3) {
       selectInput(
         'col1_select',
         'Column for x axis',
-        colnames(survey_and_responses()[[2]]),
+        c("Response_Number", colnames(survey_and_responses()[[2]])),
         multiple = FALSE,
         selectize = TRUE
       )
@@ -1291,14 +1305,6 @@ shinyServer(function(input, output, session) {
   })
 
   output[['select_column2']] <- renderUI({
-    # col2 <- names(the_question()[['Responses']])
-    # selectInput(
-    #   'col2_select',
-    #   'Column 2 select',
-    #   col2,
-    #   multiple = FALSE,
-    #   selectize = TRUE
-    # )
     if (length(survey_and_responses()) >= 3) {
       selectInput(
         'col2_select',
@@ -1309,5 +1315,12 @@ shinyServer(function(input, output, session) {
       )
     }
   })
+  
+  output$downloadPlot <- downloadHandler(
+    filename = function() { paste(input$filename, "_", input$col1_select, "_", input$col2_select, '.png', sep='') },
+    content = function(file) {
+      ggsave(file, plot = The_plot(), device = "png")
+    }
+  )
 })
 

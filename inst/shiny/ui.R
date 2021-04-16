@@ -119,14 +119,20 @@ body <- dashboardBody(
                    box(
                      width = NULL,
                      status = "info",
-                     h2("Graph Options"),
+                     # h2("Graph Options"),
                      # uiOutput("select_question"),
                      uiOutput("select_column1"),
                      uiOutput("select_column2"),
                      uiOutput("select_graphtype"),
-                     textInput("graph_title", "Graph title:")
-                     # textInput("x_label", "Label for x axis:"),
-                     # textInput("y_label", "Label for y axis:"),
+                     textInput("graph_title", "Graph title:"),
+                     textInput("x_label", "Label for x axis:"),
+                     textInput("y_label", "Label for y axis:")
+                   ),
+                   box(
+                     width = NULL,
+                     status = "warning",
+                     textInput("filename", "File name:"),
+                     downloadButton("downloadPlot")
                    ))
           )
   ),
