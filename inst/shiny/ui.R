@@ -18,6 +18,7 @@ sidebar <- dashboardSidebar(
     menuItem("Processed Results", tabName="report", icon=icon("leanpub")),
     menuItem("Include/Exclude Responses", tabName="include_exclude", icon=icon("toggle-on")),
     menuItem("Tableau Reshaping", tabName="reshape_tableau", icon=icon("chart-line")),
+    menuItem("Graphing Data", tabName="graphing_data", icon=icon("chart-bar")),
     menuItem("More Options", tabName="more_options", icon=icon("dashboard")),
     menuItem("FAQ", tabName="faq", icon=icon("question-circle")),
 
@@ -105,6 +106,31 @@ body <- dashboardBody(
             )
           )
           ),
+  tabItem(tabName = "graphing_data",
+          fluidRow(
+            column(width = 8,
+                   box(
+                     status = "info",
+                     width = NULL,
+                     plotOutput("the_graph")
+                   )
+
+            ),
+            column(width = 4,
+                   box(
+                     width = NULL,
+                     status = "info",
+                     h2("Graph Options"),
+                     # uiOutput("select_question"),
+                     uiOutput("select_column1"),
+                     uiOutput("select_column2"),
+                     uiOutput("select_graphtype"),
+                     textInput("graph_title", "Graph title:")
+                     # textInput("x_label", "Label for x axis:"),
+                     # textInput("y_label", "Label for y axis:"),
+                   ))
+          )
+  ),
   tabItem(tabName = "more_options",
           fluidRow(
             column(width = 3,
