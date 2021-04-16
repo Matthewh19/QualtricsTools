@@ -121,6 +121,7 @@ body <- dashboardBody(
                      status = "info",
                      collapsible = TRUE,
                      solidHeader = TRUE,
+                     title = "Graph Options",
                      # h2("Graph Options"),
                      # uiOutput("select_question"),
                      uiOutput("select_column1"),
