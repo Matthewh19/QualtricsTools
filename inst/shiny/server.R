@@ -1210,10 +1210,14 @@ shinyServer(function(input, output, session) {
   ################################
   ## The graph stuff
   #######################
-  output$the_graph <- renderPlot({
-    p <- The_plot()
-    p
+  observe({
+    output$the_graph <- renderPlot({
+      p <- The_plot()
+      p
+    }, width = input$g_width,
+    height = input$g_height)
   })
+  
   
   The_plot <- reactive({
     graph_type <- input$graphtype_select
@@ -1227,27 +1231,28 @@ shinyServer(function(input, output, session) {
       en <- data.frame("Response_Number" = 1:nrow(data))
       data <- cbind(en, data)
       # View(data)
-      p <- ggplot(data, aes(x = UQ(as.name(column1)), y = UQ(as.name(column2)))) +
-            ggtitle(g_title)
+      p <- ggplot2::ggplot(data, ggplot2::aes(x = UQ(as.name(column1)), y = UQ(as.name(column2)))) +
+        ggplot2::ggtitle(g_title) +
+        ggplot2::theme(plot.title = ggplot2::element_text(size = input$title_size))
       if(input$x_label == ""){
-        p <- p + xlab(column1)
+        p <- p + ggplot2::xlab(column1)
       } else{
-        p <- p + xlab(input$x_label)
+        p <- p + ggplot2::xlab(input$x_label)
       }
       if(input$y_label == ""){
-        p <- p + ylab(column2)
+        p <- p + ggplot2::ylab(column2)
       } else{
-        p <- p + ylab(input$y_label)
+        p <- p + ggplot2::ylab(input$y_label)
       }
       if(!is.null(graph_type)){
         graph_type <- paste(graph_type, collapse = "|")
         # print(graph_type)
         # print(typeof(graph_type))
         if(grepl("point", graph_type)){
-          p <- p + geom_point()
+          p <- p + ggplot2::geom_point()
         }
         if(grepl("line", graph_type)){
-          p <- p + geom_line()
+          p <- p + ggplot2::geom_line()
         }
       }
       p
@@ -1319,7 +1324,7 @@ shinyServer(function(input, output, session) {
   output$downloadPlot <- downloadHandler(
     filename = function() { paste(input$filename, "_", input$col1_select, "_", input$col2_select, '.png', sep='') },
     content = function(file) {
-      ggsave(file, plot = The_plot(), device = "png")
+      ggplot2::ggsave(file, plot = The_plot(), device = "png", width = input$g_width/96, height = input$g_height/96)
     }
   )
 })

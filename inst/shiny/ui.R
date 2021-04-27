@@ -127,6 +127,7 @@ body <- dashboardBody(
                      uiOutput("select_column1"),
                      uiOutput("select_column2"),
                      uiOutput("select_graphtype"),
+                     numericInput("title_size", "Title Size", 16),
                      textInput("graph_title", "Graph title:"),
                      textInput("x_label", "Label for x axis:"),
                      textInput("y_label", "Label for y axis:")
@@ -136,6 +137,8 @@ body <- dashboardBody(
                      collapsible = TRUE,
                      solidHeader = TRUE,
                      status = "warning",
+                     numericInput("g_width", "Graph Width", 750),
+                     numericInput("g_height", "Graph Height", 400),
                      textInput("filename", "File name:"),
                      downloadButton("downloadPlot")
                    ))
