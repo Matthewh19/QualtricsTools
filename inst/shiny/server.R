@@ -1220,106 +1220,146 @@ shinyServer(function(input, output, session) {
   
   
   The_plot <- reactive({
+    
+    validate(need(
+      length(survey_and_responses()) >= 3,
+      "Please upload the survey and responses"
+    ))
+    
     graph_type <- input$graphtype_select
     column1 <- input$col1_select
+    # print(column1)
     column2 <- input$col2_select
-    if(!is.null(column1) && !is.null(column2)){
-      g_title <- input$graph_title
-      
-      # generate_graph(q, graph_type, column1, column2, g_title )
-      data <- survey_and_responses()[[2]]
-      en <- data.frame("Response_Number" = 1:nrow(data))
-      data <- cbind(en, data)
-      # View(data)
-      p <- ggplot2::ggplot(data, ggplot2::aes(x = UQ(as.name(column1)), y = UQ(as.name(column2)))) +
-        ggplot2::ggtitle(g_title) +
-        ggplot2::theme(plot.title = ggplot2::element_text(size = input$title_size))
-      if(input$x_label == ""){
-        p <- p + ggplot2::xlab(column1)
-      } else{
-        p <- p + ggplot2::xlab(input$x_label)
+    # print(column2)
+    
+    
+    # generate_graph(q, graph_type, column1, column2, g_title )
+    # data <- survey_and_responses()[[2]]
+    data <- the_question()[['Table']]
+    data <- as.data.frame(data)
+    names(data)[1] <- "idt"
+    # View(data)
+    # en <- data.frame("Response_Number" = 1:nrow(data))
+    # data <- cbind(en, data)
+    m_data <- reshape2::melt(data, id = "idt")
+    # View(m_data)
+    s_data <- subset(m_data, variable != "N")
+    # s_data <- dplyr::arrange(s_data, idt, variable)
+    # View(s_data)
+    # p <- ggplot2::ggplot(data, ggplot2::aes(x = UQ(as.name(column1)), y = UQ(as.name(column2)))) +
+    p <- ggplot2::ggplot(s_data, ggplot2::aes(x = idt, y = value, fill = variable)) 
+    if(!is.null(graph_type)){
+      graph_type <- paste(graph_type, collapse = "|")
+      # print(graph_type)
+      # print(typeof(graph_type))
+      if(grepl("point", graph_type)){
+        p <- p + ggplot2::geom_point()
       }
-      if(input$y_label == ""){
-        p <- p + ggplot2::ylab(column2)
-      } else{
-        p <- p + ggplot2::ylab(input$y_label)
+      if(grepl("line", graph_type)){
+        p <- p + ggplot2::geom_line()
       }
-      if(!is.null(graph_type)){
-        graph_type <- paste(graph_type, collapse = "|")
-        # print(graph_type)
-        # print(typeof(graph_type))
-        if(grepl("point", graph_type)){
-          p <- p + ggplot2::geom_point()
-        }
-        if(grepl("line", graph_type)){
-          p <- p + ggplot2::geom_line()
-        }
+      if(grepl("bar", graph_type)){
+        p <- p + ggplot2::geom_bar(stat="identity", color = "black", position = ggplot2::position_dodge()) +
+          ggplot2::geom_text(ggplot2::aes(label=value), vjust=1.6, color="white",
+                    position = ggplot2::position_dodge(0.9), size=3.5)
       }
-      p
+      if(grepl("bar_horizontal", graph_type)){
+        p <- p + ggplot2::geom_bar(stat="identity", color = "black") +
+          ggplot2::coord_flip()
+      }
     }
+    
+    p <- p + ggplot2::theme(plot.title = ggplot2::element_text(size = input$title_size))
+    if(input$x_label == ""){
+      # p <- p + ggplot2::xlab(column1)
+      p <- p + ggplot2::xlab("x axis")
+    } else{
+      p <- p + ggplot2::xlab(input$x_label)
+    }
+    if(input$y_label == ""){
+      # p <- p + ggplot2::ylab(column2)
+      p <- p + ggplot2::ylab("y axis")
+    } else{
+      p <- p + ggplot2::ylab(input$y_label)
+    }
+    if(input$graph_title == ""){
+      text <- the_question()[["Payload"]][["QuestionText"]]
+      # print(text)
+      # print(typeof(text))
+      p <- p + ggplot2::ggtitle(text)
+    } else{
+      g_title <- input$graph_title
+      p <- p + ggplot2::ggtitle(g_title)
+    }
+    
+    p
   })
   
   #
   #
   # Select the question
-  # output[['select_question']] <- renderUI({
-  #   if (length(survey_and_responses()) >= 3) {
-  #     qs <- c()
-  #     for(i in 1:length(questions)){
-  #       qs <- c(qs, questions[[i]][['Payload']][['DataExportTag']])
-  #     }
-  #     selectInput(
-  #       'question_select',
-  #       'Question',
-  #       qs,
-  #       multiple = FALSE,
-  #       selectize = TRUE
-  #     )
-  #   }
-  # })
+  output[['select_question']] <- renderUI({
+    if (length(survey_and_responses()) >= 3) {
+      qdict <- unique(complete_question_dictionary()[c(1, 3, 5, 6, 7)])
+      selectInput(
+        'question_select',
+        'Question',
+        qdict,
+        multiple = FALSE,
+        selectize = TRUE
+      )
+    }
+  })
 
   the_question <- reactive({
-  q <- find_question(questions, input$question_select)
-  # print(q)
-  q
+    reactive_questions <- processed_questions_and_blocks()[[1]]
+    if(!is.null(reactive_questions)){
+      q <- find_question(reactive_questions, input$question_select)
+      # print(q)
+      q
+    }
   })
 
   # Select the type
   output[['select_graphtype']] <- renderUI({
-    ty <- c("point", "line")
+    ty <- c("bar", "bar_horizontal", "point", "line")
     selectInput(
       'graphtype_select',
       'Graph Type',
       ty,
       multiple = TRUE,
       selectize = TRUE,
-      selected = "point"
+      selected = "bar"
     )
   })
 
-  output[['select_column1']] <- renderUI({
-    if (length(survey_and_responses()) >= 3) {
-      selectInput(
-        'col1_select',
-        'Column for x axis',
-        c("Response_Number", colnames(survey_and_responses()[[2]])),
-        multiple = FALSE,
-        selectize = TRUE
-      )
-    }
-  })
-
-  output[['select_column2']] <- renderUI({
-    if (length(survey_and_responses()) >= 3) {
-      selectInput(
-        'col2_select',
-        'Column for y axis',
-        colnames(survey_and_responses()[[2]]),
-        multiple = FALSE,
-        selectize = TRUE
-      )
-    }
-  })
+  # output[['select_column1']] <- renderUI({
+  #   if (length(survey_and_responses()) >= 3) {
+  #     
+  #     selectInput(
+  #       'col1_select',
+  #       'Column for x axis',
+  #       c("Response_Number", qdict),
+  #       # c("Response_Number", colnames(survey_and_responses()[[2]])),
+  #       multiple = FALSE,
+  #       selectize = TRUE
+  #     )
+  #   }
+  # })
+  # 
+  # output[['select_column2']] <- renderUI({
+  #   if (length(survey_and_responses()) >= 3) {
+  #     qdict <- unique(complete_question_dictionary()[c(1, 3, 5, 6, 7)])
+  #     selectInput(
+  #       'col2_select',
+  #       'Column for y axis',
+  #       qdict,
+  #       # colnames(survey_and_responses()[[2]]),
+  #       multiple = FALSE,
+  #       selectize = TRUE
+  #     )
+  #   }
+  # })
   
   output$downloadPlot <- downloadHandler(
     filename = function() { paste(input$filename, "_", input$col1_select, "_", input$col2_select, '.png', sep='') },
